@@ -36,8 +36,8 @@ class Products extends StateNotifier<List<Plase>> {
   }
 
   Future<void> addPlace(String title, String price, String quantity) async {
-    final newProduct = Plase(title: title, price: price, quantity: quantity);
-    final db = await _createDatabase();
+    var newProduct = Plase(title: title, price: price, quantity: quantity);
+    var db = await _createDatabase();
 
     await db.insert('products_list', {
       'id': newProduct.id,
@@ -48,17 +48,43 @@ class Products extends StateNotifier<List<Plase>> {
     state = [newProduct, ...state];
   }
 
-  Future<void> Updateplace(String title, String price, String quantity) async {
-    final UpdateProduct = Plase(title: title, price: price, quantity: quantity);
+  Future<void> updateplace(
+      String id, String title, String price, String quantity) async {
+    final updatedProduct =
+        Plase(id: id, title: title, price: price, quantity: quantity);
     final db = await _createDatabase();
 
-    await db.update('products_list', {
-      'id': UpdateProduct.id,
-      'title': UpdateProduct.title,
-      'price': UpdateProduct.price,
-      'quantity': UpdateProduct.quantity,
-    });
-    state = [UpdateProduct, ...state];
+    await db.update(
+      'products_list',
+      {
+        'title': updatedProduct.title,
+        'price': updatedProduct.price,
+        'quantity': updatedProduct.quantity,
+      },
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+
+    // Update the state
+    state = state.map((product) {
+      if (product.id == id) {
+        return updatedProduct;
+      } else {
+        return product;
+      }
+    }).toList();
+  }
+
+  Future<void> deleteProduct(String productId) async {
+    final db = await _createDatabase();
+    await db.delete(
+      'products_list',
+      where: 'id = ?',
+      whereArgs: [productId],
+    );
+
+    // Update the state by filtering out the deleted product
+    state = state.where((product) => product.id != productId).toList();
   }
 }
 

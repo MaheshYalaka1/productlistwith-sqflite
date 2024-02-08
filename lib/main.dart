@@ -1,28 +1,26 @@
 import 'package:app_notification/screens/places.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 final colorScheme = ColorScheme.fromSeed(
     // brightness: Brightness.dark,
-    seedColor: const Color.fromARGB(255, 102, 6, 247),
-    background: const Color.fromARGB(255, 56, 49, 66));
+    seedColor: Color.fromARGB(255, 6, 247, 42),
+    background: Color.fromARGB(0, 236, 230, 245));
 
-final Theme = ThemeData().copyWith(
-    useMaterial3: true,
-    scaffoldBackgroundColor: colorScheme.background,
-    colorScheme: colorScheme,
-    textTheme: GoogleFonts.ubuntuCondensedTextTheme().copyWith(
-      titleSmall: GoogleFonts.ubuntuCondensed(
-        fontWeight: FontWeight.bold,
-      ),
-      titleMedium: GoogleFonts.ubuntuCondensed(
-        fontWeight: FontWeight.bold,
-      ),
-      titleLarge: GoogleFonts.ubuntuCondensed(
-        fontWeight: FontWeight.bold,
-      ),
-    ));
+// final Theme = ThemeData().copyWith(
+//     scaffoldBackgroundColor: colorScheme.background,
+//     colorScheme: colorScheme,
+//     textTheme: GoogleFonts.ubuntuCondensedTextTheme().copyWith(
+//       titleSmall: GoogleFonts.ubuntuCondensed(
+//         fontWeight: FontWeight.bold,
+//       ),
+//       titleMedium: GoogleFonts.ubuntuCondensed(
+//         fontWeight: FontWeight.bold,
+//       ),
+//       titleLarge: GoogleFonts.ubuntuCondensed(
+//         fontWeight: FontWeight.bold,
+//       ),
+//     ));
 
 void main() {
   runApp(
@@ -37,7 +35,6 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: " my place",
-      theme: Theme,
       home: const PlacesScreen(),
     );
   }

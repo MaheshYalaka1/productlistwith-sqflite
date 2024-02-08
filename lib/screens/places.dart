@@ -27,7 +27,7 @@ class _placesScreenState extends ConsumerState<PlacesScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('your place'),
+        title: Text('Products list'),
         actions: [
           IconButton(
             icon: const Icon(Icons.add),
