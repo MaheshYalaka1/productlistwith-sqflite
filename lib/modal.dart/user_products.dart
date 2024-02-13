@@ -1,17 +1,22 @@
+import 'dart:io';
+
 import 'package:app_notification/modal.dart/newplace.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
+import 'package:path_provider/path_provider.dart' as syspaths;
 import 'package:sqflite/sqflite.dart' as sql;
 import 'package:sqflite/sqlite_api.dart';
 import 'package:path/path.dart' as path;
 
 Future<Database> _createDatabase() async {
   final dbPath = await sql.getDatabasesPath();
+
+  print('Database path $dbPath');
+
   final db = await sql.openDatabase(
     path.join(dbPath, 'product.db'),
     onCreate: (db, version) {
       return db.execute(
-          'CREATE TABLE products_list(id TEXT PRIMARY KEY,title TEXT,price TEXT,quantity TEXT)');
+          'CREATE TABLE products_list(id TEXT PRIMARY KEY, title TEXT, price TEXT, quantity TEXT, image TEXT)');
     },
     version: 1,
   );
@@ -26,17 +31,24 @@ class Products extends StateNotifier<List<Plase>> {
     final data = await db.query('products_list');
     final products = data
         .map((row) => Plase(
-              id: row['id'] as String,
-              title: row['title'] as String,
-              price: row['price'] as String, // Corrected 'price' from 'Price'
-              quantity: row['quantity'] as String,
-            ))
+            id: row['id'] as String,
+            title: row['title'] as String,
+            price: row['price'] as String,
+            quantity: row['quantity'] as String,
+            image: File(row['image'] as String)))
         .toList();
     state = products;
   }
 
-  Future<void> addPlace(String title, String price, String quantity) async {
-    var newProduct = Plase(title: title, price: price, quantity: quantity);
+  Future<void> addPlace(
+      String title, String price, String quantity, File image) async {
+    final appDir = await syspaths.getApplicationDocumentsDirectory();
+    final filename = path.basename(image.path);
+
+    final copiedImage = await image.copy('${appDir.path}/$filename');
+
+    var newProduct = Plase(
+        title: title, price: price, quantity: quantity, image: copiedImage);
     var db = await _createDatabase();
 
     await db.insert('products_list', {
@@ -44,14 +56,23 @@ class Products extends StateNotifier<List<Plase>> {
       'title': newProduct.title,
       'price': newProduct.price,
       'quantity': newProduct.quantity,
+      'image': newProduct.image.path,
     });
     state = [newProduct, ...state];
   }
 
-  Future<void> updateplace(
-      String id, String title, String price, String quantity) async {
-    final updatedProduct =
-        Plase(id: id, title: title, price: price, quantity: quantity);
+  Future<void> updatePlace(String id, String title, String price,
+      String quantity, File image) async {
+    final appDir = await syspaths.getApplicationDocumentsDirectory();
+    final filename = path.basename(image.path);
+    final copiedImage = await image.copy('${appDir.path}/$filename');
+    final updatedProduct = Plase(
+      id: id,
+      title: title,
+      price: price,
+      quantity: quantity,
+      image: copiedImage,
+    );
     final db = await _createDatabase();
 
     await db.update(
@@ -60,6 +81,7 @@ class Products extends StateNotifier<List<Plase>> {
         'title': updatedProduct.title,
         'price': updatedProduct.price,
         'quantity': updatedProduct.quantity,
+        'image': updatedProduct.image.path,
       },
       where: 'id = ?',
       whereArgs: [id],

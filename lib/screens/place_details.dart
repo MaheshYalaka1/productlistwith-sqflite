@@ -1,5 +1,9 @@
+import 'dart:io';
+
 import 'package:app_notification/modal.dart/newplace.dart';
+
 import 'package:app_notification/modal.dart/user_products.dart';
+import 'package:app_notification/widget/image_input.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -18,6 +22,7 @@ class _placeDetailsScreenState extends ConsumerState<placeDetailsScreen> {
   TextEditingController _titleController = TextEditingController();
   TextEditingController _priceController = TextEditingController();
   TextEditingController _quantityController = TextEditingController();
+  File? _selectedImage;
 
   @override
   void initState() {
@@ -38,6 +43,12 @@ class _placeDetailsScreenState extends ConsumerState<placeDetailsScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
+              Image.file(
+                widget.Product.image,
+                fit: BoxFit.cover,
+                width: 150,
+                height: 100,
+              ),
               Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
@@ -51,6 +62,7 @@ class _placeDetailsScreenState extends ConsumerState<placeDetailsScreen> {
                       ? _buildTextField(_quantityController, 'Product Quantity')
                       : _buildText(
                           'Product Quantity: ${widget.Product.quantity}'),
+                  _selectImage(_selectedImage)
                 ],
               ),
               const SizedBox(
@@ -75,17 +87,19 @@ class _placeDetailsScreenState extends ConsumerState<placeDetailsScreen> {
   }
 
   void _savePlaces() {
-    final UpdateTitel = _titleController.text;
-    final UpdatePrice = _priceController.text;
-    final Updatequantity = _quantityController.text;
+    final updateTitle = _titleController.text;
+    final updatePrice = _priceController.text;
+    final updateQuantity = _quantityController.text;
     final productId = widget.Product.id;
 
-    if (UpdateTitel.isEmpty || UpdatePrice.isEmpty || Updatequantity.isEmpty) {
+    if (updateTitle.isEmpty ||
+        updatePrice.isEmpty ||
+        updateQuantity.isEmpty ||
+        _selectedImage == null) {
       return;
     }
-    ref
-        .read(productsListProvider.notifier)
-        .updateplace(productId, UpdateTitel, UpdatePrice, Updatequantity);
+    ref.read(productsListProvider.notifier).updatePlace(
+        productId, updateTitle, updatePrice, updateQuantity, _selectedImage!);
     Navigator.of(context).pop();
   }
 
@@ -115,5 +129,19 @@ class _placeDetailsScreenState extends ConsumerState<placeDetailsScreen> {
         labelText: labelText,
       ),
     );
+  }
+
+  Widget _selectImage(File? selectedImage) {
+    return _isEditing
+        ? ImageInput(
+            onPicked: (File image) {
+              setState(() {
+                _selectedImage = image;
+              });
+            },
+          )
+        : SizedBox(
+            height: 10,
+          ); // Render an empty SizedBox if not editing
   }
 }

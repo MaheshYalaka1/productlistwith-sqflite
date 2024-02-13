@@ -20,7 +20,7 @@ class _placesListState extends ConsumerState<placesList> {
     if (widget.product.isEmpty) {
       return Center(
         child: Text(
-          'No places added yet',
+          'No Products added yet',
           style: Theme.of(context)
               .textTheme
               .bodyLarge!
@@ -31,6 +31,8 @@ class _placesListState extends ConsumerState<placesList> {
     return ListView.builder(
       itemCount: widget.product.length,
       itemBuilder: (ctx, index) => ListTile(
+        leading: CircleAvatar(
+            backgroundImage: FileImage(widget.product[index].image)),
         title: Text(
           widget.product[index].title,
           style: Theme.of(context)
